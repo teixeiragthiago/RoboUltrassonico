@@ -1,4 +1,4 @@
-#include <AFMotor.h>
+            #include <AFMotor.h>
 #include <Servo.h>
 #include <Ultrasonic.h>
 
@@ -19,14 +19,14 @@ int val = 0;
 Ultrasonic ultrasonic(trig,echo);
 
 //Variaveis globais
-float distanciaDireita, distanciaEsquerda;
+float distanciaDireita, distanciaEsquerda, distanciaFrontal;
 
 void moverFrente();
 void desligaMotores();
-void controlaServo();
 void virarDireita();
 void virarEsquerda();
 void decisao();
+void virarAoRedor();
 
 float medirDistancia();
 float distanciaCM;
@@ -39,29 +39,21 @@ void setup()
   motorDireito1.setSpeed(255); 
   motorDireito2.setSpeed(255);
   myservo.attach(servo);
+  digitalWrite(trig, LOW);
+  myservo.write(80);
+  delay(500);
 }
  
 void loop()
 {
-  moverFrente();
+  
   distanciaCM = medirDistancia();
   if(distanciaCM < 20)
   {
     decisao();
   }
-  delay(100); 
-}
-
-
-void controlaServo(){
-  myservo.write(160); //virando servo para a esquerda
-  delay(2000);
-  myservo.write(80);
-  delay(2000);    
-  myservo.write(0); //virando servo para a direita
-  delay(2000);  
-  myservo.write(80);
-  delay(2000);
+  delay(100);
+   
 }
 
 float medirDistancia(){
@@ -82,7 +74,6 @@ void triggerPulso() //gerando o pulso de trigger/gatilho do sensor ultrassonico
 
 void decisao()
 {  
-  myservo.write(80);
    desligaMotores();
    delay(500);
    myservo.write(0);
@@ -101,7 +92,7 @@ void decisao()
      moverTras();
      delay(600);
      virarDireita();
-     delay(2000);
+     delay(1000);
      moverFrente();
    }
    else
@@ -109,8 +100,8 @@ void decisao()
      moverTras();
      delay(600);
      virarEsquerda();
-     delay(2000);
-     moverFrente(); 
+     delay(1000);
+     moverFrente();
    }
 }
 
@@ -119,6 +110,11 @@ void moverFrente(){
   motorEsquerdo2.run(FORWARD); //sentido horario
   motorDireito1.run(FORWARD); //sentido  horario
   motorDireito2.run(FORWARD); //sentido horario
+  distanciaFrontal = medirDistancia();
+  if(distanciaFrontal < 20)
+  {
+    decisao();  
+  }
 }
 
 void moverTras(){
@@ -151,6 +147,19 @@ void virarEsquerda(){
   motorDireito1.run(FORWARD);
   motorDireito2.run(FORWARD);
   
+}
+
+void virarAoRedor()
+{
+  motorEsquerdo1.run(FORWARD);
+  motorEsquerdo2.run(FORWARD);
+  motorDireito1.run(BACKWARD);
+  motorDireito2.run(BACKWARD);
+  delay(1700);
+  motorEsquerdo1.run(FORWARD);
+  motorEsquerdo2.run(FORWARD);
+  motorDireito1.run(FORWARD);
+  motorDireito2.run(FORWARD);  
 }
 
 void desligaMotores(){
