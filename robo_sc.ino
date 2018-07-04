@@ -34,10 +34,10 @@ float distanciaCM;
 void setup()
 {
   // Define a velocidade maxima para os motores
-  motorEsquerdo1.setSpeed(255); 
-  motorEsquerdo2.setSpeed(255); 
-  motorDireito1.setSpeed(255); 
-  motorDireito2.setSpeed(255);
+  motorEsquerdo1.setSpeed(150); 
+  motorEsquerdo2.setSpeed(150); 
+  motorDireito1.setSpeed(150); 
+  motorDireito2.setSpeed(150);
   myservo.attach(servo);
   digitalWrite(trig, LOW);
   myservo.write(80);
@@ -168,4 +168,6 @@ void desligaMotores(){
   motorDireito1.run(RELEASE); //desligando motor direito 1
   motorDireito2.run(RELEASE); //desligando motor esquerdo 2
 }
+
+
 
