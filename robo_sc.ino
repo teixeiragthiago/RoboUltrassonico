@@ -1,6 +1,7 @@
-            #include <AFMotor.h>
+#include <AFMotor.h>
 #include <Servo.h>
 #include <Ultrasonic.h>
+
 
 AF_DCMotor motorEsquerdo1(1); 
 AF_DCMotor motorEsquerdo2(2); 
@@ -20,6 +21,8 @@ Ultrasonic ultrasonic(trig,echo);
 
 //Variaveis globais
 float distanciaDireita, distanciaEsquerda, distanciaFrontal;
+float microsec;
+float distanciaCm = 0;
 
 void moverFrente();
 void desligaMotores();
@@ -33,11 +36,14 @@ float distanciaCM;
 
 void setup()
 {
-  // Define a velocidade maxima para os motores
-  motorEsquerdo1.setSpeed(150); 
-  motorEsquerdo2.setSpeed(150); 
-  motorDireito1.setSpeed(150); 
-  motorDireito2.setSpeed(150);
+  //Definindo pinos echo e trigger
+  pinMode(echo, INPUT); //echo como entrada
+  pinMode(trig, OUTPUT); //trig como saida
+  // Define a velocidade para os motores
+  motorEsquerdo1.setSpeed(110); 
+  motorEsquerdo2.setSpeed(110); 
+  motorDireito1.setSpeed(110); 
+  motorDireito2.setSpeed(110);
   myservo.attach(servo);
   digitalWrite(trig, LOW);
   myservo.write(80);
@@ -46,9 +52,9 @@ void setup()
  
 void loop()
 {
-  
+  moverFrente();
   distanciaCM = medirDistancia();
-  if(distanciaCM < 20)
+  if(distanciaCM < 15)
   {
     decisao();
   }
@@ -57,19 +63,12 @@ void loop()
 }
 
 float medirDistancia(){
-  float pulso;
-  triggerPulso();
   
-  pulso = pulseIn(echo, HIGH);
-
-  return (pulso/58.82);
-}
-
-void triggerPulso() //gerando o pulso de trigger/gatilho do sensor ultrassonico
-{
-  digitalWrite(trig, HIGH);
-  delayMicroseconds(10);
-  digitalWrite(trig, LOW); 
+  microsec = ultrasonic.timing();
+  distanciaCm = ultrasonic.convert(microsec, Ultrasonic::CM);
+  
+  return distanciaCm;
+  
 }
 
 void decisao()
@@ -90,7 +89,7 @@ void decisao()
    if(distanciaDireita > distanciaEsquerda)
    {
      moverTras();
-     delay(600);
+     delay(500);
      virarDireita();
      delay(1000);
      moverFrente();
@@ -98,7 +97,7 @@ void decisao()
    else
    {
      moverTras();
-     delay(600);
+     delay(500);
      virarEsquerda();
      delay(1000);
      moverFrente();
@@ -110,11 +109,6 @@ void moverFrente(){
   motorEsquerdo2.run(FORWARD); //sentido horario
   motorDireito1.run(FORWARD); //sentido  horario
   motorDireito2.run(FORWARD); //sentido horario
-  distanciaFrontal = medirDistancia();
-  if(distanciaFrontal < 20)
-  {
-    decisao();  
-  }
 }
 
 void moverTras(){
@@ -129,7 +123,7 @@ void virarDireita(){
   motorEsquerdo2.run(FORWARD);
   motorDireito1.run(BACKWARD);
   motorDireito2.run(BACKWARD);
-  delay(1500);
+  delay(1000);
   motorEsquerdo1.run(FORWARD);
   motorEsquerdo2.run(FORWARD);
   motorDireito1.run(BACKWARD);
@@ -141,7 +135,7 @@ void virarEsquerda(){
   motorEsquerdo2.run(BACKWARD);
   motorDireito1.run(FORWARD);
   motorDireito2.run(FORWARD);
-  delay(1500);
+  delay(1000);
   motorEsquerdo1.run(FORWARD);
   motorEsquerdo2.run(FORWARD);
   motorDireito1.run(FORWARD);
